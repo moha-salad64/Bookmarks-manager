@@ -15,13 +15,14 @@ const app = express();
 const PORT = process.env.PORT || 4141;
 
 app.use(express.json());
+app.use(express.static('view'));
 
 //importing the routes
 const bookRoutes = require("./routes/bookmarkRoute");
 
-// app.get('/api/books' , (req , res) =>{
-//     res.sendFile('./views/bookmark.html', {root: __dirname});
-// })
+app.get('/api/books' , (req , res) =>{
+    res.sendFile('./views/bookmark.html', {root: __dirname});
+})
 
 
 app.use('/api/books' , bookRoutes)

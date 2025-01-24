@@ -6,7 +6,7 @@ const {getBooks , createBook , updateBook , deleteBook} = require('../controller
 
 //creat rout directory
 router.get('/' , getBooks);
-router.post('/' , createBook);
+router.post('/create' , createBook);
 router.patch('/:id' , updateBook);
 router.delete('/:id' , deleteBook);
 

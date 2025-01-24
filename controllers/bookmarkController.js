@@ -15,14 +15,18 @@ exports.getBooks = async (req , res , next) =>{
     }
 }
 
+
 exports.createBook = async (req , res , next) =>{
     try{
-        const books = await BookMarks.create(req.body);
-        res.status(200).json({
-            success: true,
-            message: "Inserting Book successfully",
-            data: books,
-        })
+        const {bookName ,   autherName , description , date} = req.body;
+        const books = new  BookMarks({
+            bookName, 
+            autherName,
+            description, 
+            date,
+        });
+        await books.save();
+        res.status(200).json(books)
     }catch(error){
         next(error)
     }
