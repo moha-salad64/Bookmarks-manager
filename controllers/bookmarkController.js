@@ -47,17 +47,19 @@ exports.updateBook = async (req , res) =>{
 
 exports.deleteBook = async (req , res) =>{
     try{
-        const  bookId = req.params.id;
-        const bookDeleted =await BookMarks.findOneAndDelete(bookId);
+        const  {id} = req.params;
+        const bookDeleted =await BookMarks.findOneAndDelete(id);
         if(!bookDeleted){
             return res.status(404).json({
                 message: 'book was not deleted'
             });
         }
-
-        res.json({
-            message: 'book deleted was successfully' , book: bookDeleted
-        })
+        else{
+            res.json({
+                message: 'book deleted was successfully' ,
+                 book: bookDeleted
+            })
+        }
     }catch(error){
         console.log('deleting book error' , error);
         res.status(500).json({
