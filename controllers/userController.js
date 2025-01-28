@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt')
 const User = require('../models/userModel');
 
 //creating user
@@ -69,4 +70,32 @@ exports.deleteUser = async (req , res) =>{
         res.status(500).json({ message: 'deleted user error' })
     }
 
+}
+
+
+exports.login = async (req , res) =>{
+    try {
+        const {email , password} = req.body;
+        const userlogin = await User.findOne({email});
+        if(!userlogin){
+            return res.status(404).json({
+                message: 'user not found'
+            })
+        }
+
+        //compate password and hashed password
+        const isMatch = await bcrypt.compare(password , userlogin.password);
+        if(!isMatch){
+            return res.status(401).json({
+                message: 'Invaid login user'
+            })
+        }
+        res.status(200).json({
+            message: 'Login successful' , userlogin
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error Logging' , error: error.message
+        })
+    }
 }

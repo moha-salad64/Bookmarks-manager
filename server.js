@@ -21,6 +21,10 @@ app.use('/' , bookRoutes);
 app.use('/' , userRoutes)
 
 
+app.get('/' , (req , res) =>{
+    res.sendFile(path.join(__dirname , '.' , 'views' , 'home.html'));
+})
+
 app.get('/books' , (req , res) =>{
     res.sendFile(path.join(__dirname , '.' , 'views' , 'bookmark.html'));
 })
