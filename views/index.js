@@ -7,112 +7,99 @@ const autherNameField = document.getElementById('authorName');
 const descriptionField = document.getElementById('description');
 const dateField = document.getElementById('date');
 
-// Function to load all books and display them in the table
-async function loadData() {
-  try {
-    const response = await fetch('/api/books'); // Fetch books from backend
-    const data = await response.json();
-    booklist.innerHTML = data
-      .map(
-        (book) => `
+  //fetching books and display on the frontend
+  const fetchBooks = async () =>{
+    try {
+      const response = await fetch('/api/book');
+      const books = await response.json();
+      console.log(books)
+      booklist.innerHTML = books.map(book =>`
         <tr>
-          <td class="p-2 border">${book.bookName}</td>
-          <td class="p-2 border">${book.authorName}</td>
-          <td class="p-2 border">${book.description}</td>
-          <td class="p-2 border">${book.date}</td>
-          <td class="p-2 border">
-            <button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="updateBook('${book._id}')">Update</button>
-            <button class="bg-red-500 text-white px-4 py-2 rounded" onclick="deleteBook('${book._id}')">Delete</button>
-          </td>
+        <td>${book.bookName}</td>
+        <td>${book.authorName}</td>
+        <td>${book.description}</td>
+        <td>${book.date}</td>
+        <td>
+        <button onclick="editBook('${book._id}' , '${book.bookName}' , '${book.authorName}' , '${book.description}' , '${book.date}')">Update</button>
+        <button onclick="deleteBook('${book._id}')">delete</button>
+        </td>
         </tr>`
-      )
-      .join('');
-  } catch (error) {
-    console.error('Error loading data:', error);
+      ).join('');
+    } catch (error) {
+      console.log('Error feching list of books' , error)
+    }
   }
-}
 
+  let editBookId = null;
 // Function to handle form submission for creating a new book
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const newBook = {
-    bookName: bookNameField.value,
-    authorName: autherNameField.value,
-    description: descriptionField.value,
-    date: dateField.value,
-  };
 
-  try {
-    const response = await fetch('/api/books', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newBook),
-    });
+    bookName = bookNameField.value
+    authorName = autherNameField.value
+    description = descriptionField.value
+    date = dateField.value
 
-    if (response.ok) {
-      alert('Book added successfully!');
-      form.reset();
-      loadData();
-    } else {
-      console.error('Error adding book:', await response.json());
+  if(editBookId){
+    try {
+      const response = await fetch(`api/book/${editBookId}`,{
+        method: "put",
+        headers: {'Content-type':'application/json'},
+        body: JSON.stringify({bookName , authorName, description, date,}),
+      })
+      const result = await response.json();
+      if(response.ok){
+        alert(result.message || 'book updated successfully')
+        editBookId = null
+        fetchBooks();
+      }else{
+        alert(result.message || 'Failed book updated');
+      }
+    } catch (error) {
+      console.log('error book updated' , error)
     }
-  } catch (error) {
-    console.error('Error:', error);
   }
+  else{
+        try {
+          const response = await fetch('/api/book' , {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({bookName , authorName , description, date})
+          });
+    
+          const result = await response.json();
+          console.log(result)
+          if(response.ok){
+            alert(result.message || 'book added successfully');
+            // form.reset();
+            fetchBooks();
+          }
+          else{
+            alert(result.message || 'Failed to add books');
+          }
+        } catch (error) {
+          console.log('error of adding book' , error);
+        }
+  }
+
+    bookNameField.value = "";
+    autherNameField.value ="";
+    descriptionField.value ="";
+    dateField.value = "";
+
 });
 
-// Function to delete a book by ID
+//finction that pass input fields value to make update
+async function editBook(bookid , bookName , authorName , description , date) {
+  editBookId = bookid;
+  document.getElementById('bookName').value = bookName;
+  document.getElementById('authorName').value = authorName;
+  document.getElementById('description').value = description;
+  document.getElementById('date').value = date;
+}
+
+//delete function
 async function deleteBook(bookId) {
-  if (confirm('Are you sure you want to delete this book?')) {
-    try {
-      const response = await fetch(`/api/books/${bookId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        alert('Book deleted successfully!');
-        loadData();
-      } else {
-        console.error('Error deleting book:', await response.json());
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
+    await fetch(`/api/book/${bookId}` , {method: 'DELETE'})
+    fetchBooks();
 }
-
-// Function to update a book (opens a prompt to enter new values)
-async function updateBook(bookId) {
-  const bookName = prompt('Enter new book name:');
-  const authorName = prompt('Enter new author name:');
-  const description = prompt('Enter new description:');
-  const date = prompt('Enter new date (YYYY-MM-DD):');
-
-  if (bookName && authorName && description && date) {
-    const updatedBook = { bookName, authorName, description, date };
-
-    try {
-      const response = await fetch(`/api/books/${bookId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedBook),
-      });
-
-      if (response.ok) {
-        alert('Book updated successfully!');
-        loadData();
-      } else {
-        console.error('Error updating book:', await response.json());
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-}
-
-// Initial data load
-loadData();

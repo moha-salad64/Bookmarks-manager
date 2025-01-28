@@ -1,59 +1,67 @@
 const BookMarks = require('../models/bookmark');
 
-exports.getBooks = async (req , res , next) =>{
+exports.createBook = async (req , res) =>{
     try {
-        const books = await BookMarks.find({});
-        res.json(books)
-        // res.status(200).json({
-        //     success:true,
-        //     message: "Getting books successfully",
-        //     data: books
-        // })
-        
+        const {bookName , authorName , description , date} = req.body;
+        const newBook = new BookMarks({bookName , authorName , description , date});
+        await newBook.save();
+        res.status(200).json({message: 'Insertion book successfully'});
     } catch (error) {
-        next(error)
+        console.log('creating book error' , error)
+        res.status(500).json('invalid book insetion!');
     }
 }
-
-
-exports.createBook = async (req , res , next) =>{
+exports.getBooks = async (req , res) =>{
     try{
-        const {bookName ,   autherName , description , date} = req.body;
-        const books = new  BookMarks({
-            bookName, 
-            autherName,
-            description, 
-            date,
-        });
-        await books.save();
-        res.status(200).json(books)
+      const books = await BookMarks.find();
+      res.status(200).json(books); 
     }catch(error){
-        next(error)
+        console.log('retraving book error', error)
+        res.status(500).send('book can not find');
     }
 }
 
-exports.updateBook = async (req , res , next) =>{
+exports.updateBook = async (req , res) =>{
     try {
-        const books = await BookMarks.findByIdAndUpdate(req.params.id , req.body , {new: true});
-        res.status(200).json({
-        success:true,
-        message: "Book updated successfully",
-        data: books
-        })
+        const {bookID} = req.params;
+        const updatedData = req.body;
+        bookUpdated = await BookMarks.findOneAndUpdate(
+            bookID,
+            updatedData
+        );
+        if(!bookUpdated){
+            return res.status(404).json({
+                message: "book can not found"
+            });
+        }
+        res.json({
+            message: 'book updated successfully' , book: bookUpdated
+        });
     } catch (error) {
-        next(error)
+        console.log('updating book error' , error)
+        res.json(({
+            message:'book updated error'
+        }))
     }
 }
 
 exports.deleteBook = async (req , res) =>{
     try{
-        const books = await BookMarks.findByIdAndDelete(req.params.id);
-        res.status(200).json({
-            success:true,
-            message:"book deleted successfully",
-            data: books
+        const  bookId = req.params.id;
+        const bookDeleted =await BookMarks.findOneAndDelete(bookId);
+        if(!bookDeleted){
+            return res.status(404).json({
+                message: 'book was not deleted'
+            });
+        }
+
+        res.json({
+            message: 'book deleted was successfully' , book: bookDeleted
         })
     }catch(error){
-        next(error);
+        console.log('deleting book error' , error);
+        res.status(500).json({
+            message: 'deleted book error'
+        })
     }
 }

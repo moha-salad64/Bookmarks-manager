@@ -5,21 +5,21 @@ const mongoose = require('mongoose');
 const BookSchema = new mongoose.Schema({
     bookName:{
         type:String ,
-        require:true
+        required:true
         },
-    autherName:{
+    authorName:{
         type:String ,
-        require:true
+        required:true
         },
     description:{
         type:String ,
-        require:true
+        required:true
     },
     date:{
         type:Date ,
-        require:false
+        required:true
     }
 })
 
-const BookMarks = mongoose.model('BookMarks' , BookSchema);
-module.exports = BookMarks;
+module.exports  = mongoose.model('bookmarks' , BookSchema);
+// module.exports = BookMarks;
