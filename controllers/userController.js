@@ -82,7 +82,8 @@ exports.deleteUser = async (req , res) =>{
 exports.getUserLogin = async (req , res) =>{
     try {
         const {email , password} = req.body;
-        const userlogin = await User.findOne({email});
+        const userlogin = await User().findByCredentials(email , password);
+        console.log(userlogin);
         if(!userlogin){
             return res.status(404).json({
                 message: 'user not found'

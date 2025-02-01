@@ -9,6 +9,6 @@ router.get('/api/user' , userController.getUsers)
 router.put('/api/user/:id', userController.updateUseer);
 router.delete('/api/user/:id', userController.deleteUser);
 
-// router.get('/api/login' , userController.getUserLogin);
+router.get('/api/login' , userController.getUserLogin);
 
 module.exports = router;
