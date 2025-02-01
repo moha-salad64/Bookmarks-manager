@@ -11,8 +11,14 @@ exports.createUser = async (req , res) =>{
                 message:'username ,  password , email are required'
             })
         }
+        
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = new User({ username , password , email , role: role,});
+        const newUser = new User({ 
+            username , 
+            password: hashedPassword, 
+            email , 
+            role: role,});
         await newUser.save()
         res.status(200).json({message: 'user creation successfully' , user: newUser});
     }catch(error){
