@@ -73,7 +73,7 @@ exports.deleteUser = async (req , res) =>{
 }
 
 
-exports.login = async (req , res) =>{
+exports.getUserLogin = async (req , res) =>{
     try {
         const {email , password} = req.body;
         const userlogin = await User.findOne({email});
